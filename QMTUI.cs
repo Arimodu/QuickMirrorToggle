@@ -1,7 +1,11 @@
 ﻿using BeatSaberMarkupLanguage;
 using BeatSaberMarkupLanguage.Attributes;
 using BeatSaberMarkupLanguage.GameplaySetup;
+#if LATEST
 using BeatSaberMarkupLanguage.Util;
+#else
+using BeatSaberMarkupLanguage.Components;
+#endif
 using SiraUtil.Logging;
 using System.Linq;
 using UnityEngine;

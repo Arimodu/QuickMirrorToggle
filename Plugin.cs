@@ -2,6 +2,7 @@
 using IPA.Config;
 using IPA.Config.Stores;
 using SiraUtil.Zenject;
+using Zenject;
 using IPALogger = IPA.Logging.Logger;
 
 namespace QuickMirrorToggle
@@ -24,7 +25,11 @@ namespace QuickMirrorToggle
 
             zenject.Install(Location.Menu, Container =>
             {
-                Container.BindInterfacesAndSelfTo<QMTUI>().AsSingle();
+#if LATEST
+                Container.BindInterfacesAndSelfTo<QMTUI>().AsSingle(); 
+#else
+                Container.BindInterfacesAndSelfTo<QMTUI>().FromNewComponentAsViewController().AsSingle();
+#endif
                 Container.BindInterfacesAndSelfTo<MirrorManager>().AsSingle();
             });
         }

@@ -7,14 +7,20 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QuickMirrorToggle", "QuickM
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug Latest|Any CPU = Debug Latest|Any CPU
 		Debug|Any CPU = Debug|Any CPU
+		Release Latest|Any CPU = Release Latest|Any CPU
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{BBE489DC-971F-495B-9B54-659DF37836B1}.Debug Latest|Any CPU.ActiveCfg = Debug Latest|Any CPU
+		{BBE489DC-971F-495B-9B54-659DF37836B1}.Debug Latest|Any CPU.Build.0 = Debug Latest|Any CPU
 		{BBE489DC-971F-495B-9B54-659DF37836B1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{BBE489DC-971F-495B-9B54-659DF37836B1}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{BBE489DC-971F-495B-9B54-659DF37836B1}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{BBE489DC-971F-495B-9B54-659DF37836B1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BBE489DC-971F-495B-9B54-659DF37836B1}.Release Latest|Any CPU.ActiveCfg = Release Latest|Any CPU
+		{BBE489DC-971F-495B-9B54-659DF37836B1}.Release Latest|Any CPU.Build.0 = Release Latest|Any CPU
+		{BBE489DC-971F-495B-9B54-659DF37836B1}.Release|Any CPU.ActiveCfg = Debug|Any CPU
+		{BBE489DC-971F-495B-9B54-659DF37836B1}.Release|Any CPU.Build.0 = Debug|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

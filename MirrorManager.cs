@@ -10,7 +10,7 @@ namespace QuickMirrorToggle
     {
         private readonly MirrorRendererSO MirrorRenderer;
         private readonly MirrorRendererGraphicsSettingsPresets MirrorGraphicsPreset;
-        [Inject] private readonly MainSettingsModelSO MainSettingsModel;
+        private readonly MainSettingsModelSO MainSettingsModel;
         [Inject] private readonly QMTConfig _config;
         [Inject] private readonly SiraLog _logger;
         [Inject] private readonly QMTUI UI;
@@ -19,6 +19,7 @@ namespace QuickMirrorToggle
         {
             MirrorRenderer = Resources.FindObjectsOfTypeAll<MirrorRendererSO>().First();
             MirrorGraphicsPreset = Resources.FindObjectsOfTypeAll<MirrorRendererGraphicsSettingsPresets>().First();
+            MainSettingsModel = Resources.FindObjectsOfTypeAll<MainSettingsModelSO>().First();
         }
 
         public void Initialize()
