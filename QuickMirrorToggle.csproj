@@ -34,25 +34,6 @@
     <LangVersion>8.0</LangVersion>
     <ErrorReport>prompt</ErrorReport>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)' == 'Debug Latest'">
-    <DebugSymbols>true</DebugSymbols>
-    <OutputPath>bin\Debug Latest\</OutputPath>
-    <DefineConstants>LATEST;DEBUG</DefineConstants>
-    <DebugType>portable</DebugType>
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <LangVersion>8.0</LangVersion>
-    <ErrorReport>prompt</ErrorReport>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)' == 'Release Latest'">
-    <DebugSymbols>true</DebugSymbols>
-    <OutputPath>bin\Release Latest\</OutputPath>
-    <DefineConstants>LATEST;RELEASE</DefineConstants>
-    <Optimize>true</Optimize>
-    <DebugType>portable</DebugType>
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <LangVersion>8.0</LangVersion>
-    <ErrorReport>prompt</ErrorReport>
-  </PropertyGroup>
   <PropertyGroup Condition=" !'$(DefineConstants.Contains(LATEST))' ">
     <Version>1.0.0</Version>
     <GameVersion>1.29.1</GameVersion>
