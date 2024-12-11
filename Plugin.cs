@@ -25,21 +25,14 @@ namespace QuickMirrorToggle
 
             zenject.Install(Location.Menu, Container =>
             {
-#if LATEST
-                Container.BindInterfacesAndSelfTo<QMTUI>().AsSingle(); 
-#else
                 Container.BindInterfacesAndSelfTo<QMTUI>().FromNewComponentAsViewController().AsSingle();
-#endif
                 Container.BindInterfacesAndSelfTo<MirrorManager>().AsSingle();
             });
-        }
-    }
 
-    public enum MirrorState
-    {
-        Off,
-        Low,
-        Medium,
-        High
+            //zenject.Install(Location.GameCore, Container =>
+            //{
+            //    Container.BindInterfacesAndSelfTo<MirrorManager>().AsSingle();
+            //});
+        }
     }
 }

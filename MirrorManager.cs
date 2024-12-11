@@ -1,35 +1,32 @@
 ﻿using SiraUtil.Logging;
 using System;
-using System.Linq;
-using UnityEngine;
 using Zenject;
+using static BeatSaber.Settings.QualitySettings;
 
 namespace QuickMirrorToggle
 {
     internal class MirrorManager : IInitializable, IDisposable
     {
-        private readonly MirrorRendererSO MirrorRenderer;
-        private readonly MirrorRendererGraphicsSettingsPresets MirrorGraphicsPreset;
-        private readonly MainSettingsModelSO MainSettingsModel;
+        [Inject] private readonly SettingsManager _settingsManager;
+        [Inject] private readonly SettingsApplicatorSO _settingsApplicator;
+        [Inject] private readonly GameScenesManager _gameScenesManager;
+        [Inject] private readonly IFileStorage _fileStorage;
         [Inject] private readonly QMTConfig _config;
         [Inject] private readonly SiraLog _logger;
-        [Inject] private readonly QMTUI UI;
-
-        public MirrorManager()
-        {
-            MirrorRenderer = Resources.FindObjectsOfTypeAll<MirrorRendererSO>().First();
-            MirrorGraphicsPreset = Resources.FindObjectsOfTypeAll<MirrorRendererGraphicsSettingsPresets>().First();
-            MainSettingsModel = Resources.FindObjectsOfTypeAll<MainSettingsModelSO>().First();
-        }
 
         public void Initialize()
         {
             _logger.Info("Initializing MirrorManager");
-            _config.GameMirrorSetting = (MirrorState)(int)MainSettingsModel.mirrorGraphicsSettings;
+            _config.GameMirrorSetting = _settingsManager.settings.quality.mirror;
             SetMirrorState(_config.MirrorState);
-            UI.QMTToggleValue = _config.GameMirrorSetting == MirrorState.Off ? (_config.MirrorState != MirrorState.Off) : (_config.MirrorState == MirrorState.Off);
 
             _config.OnChanged += Config_OnChanged;
+            _gameScenesManager.transitionDidFinishEvent += GameScenesManager_transitionDidFinishEvent;
+        }
+
+        private void GameScenesManager_transitionDidFinishEvent(GameScenesManager.SceneTransitionType arg1, ScenesTransitionSetupDataSO SceneSetupData, DiContainer arg3)
+        {
+            SetMirrorState(_config.MirrorState);
         }
 
         private void Config_OnChanged(QMTConfig newConfig)
@@ -37,34 +34,15 @@ namespace QuickMirrorToggle
             SetMirrorState(newConfig.MirrorState);
         }
 
-        public void SetMirrorState(MirrorState state)
+        public void SetMirrorState(MirrorQuality state)
         {
-            var preset = MirrorGraphicsPreset.presets[MainSettingsModel.mirrorGraphicsSettings]; // Default to game default if anything unexpected happens
-            switch (state)
-            {
-                case MirrorState.Off:
-                    preset = MirrorGraphicsPreset.presets[0];
-                    break;
-                case MirrorState.Low:
-                    preset = MirrorGraphicsPreset.presets[1];
-                    break;
-                case MirrorState.Medium:
-                    preset = MirrorGraphicsPreset.presets[2];
-                    break;
-                case MirrorState.High:
-                    preset = MirrorGraphicsPreset.presets[3];
-                    break;
-                default:
-                    break;
-            }
-
-            SetMirrorFromPreset(preset);
-        }
-
-        private void SetMirrorFromPreset(MirrorRendererGraphicsSettingsPresets.Preset preset)
-        {
-            _logger.Info($"Setting mirror to {preset.mirrorType}");
-            MirrorRenderer.Init(preset.reflectLayers, preset.stereoTextureWidth, preset.stereoTextureHeight, preset.monoTextureWidth, preset.monoTextureHeight, preset.maxAntiAliasing, preset.enableBloomPrePassFog);
+            _logger.Info($"Setting mirror to {state}");
+            var settings = _settingsManager.settings;
+            settings.quality.mirror = state;
+            //await SettingsIO.SaveAsync(_fileStorage, settings);
+            _settingsManager.settings = settings;
+            _settingsApplicator.ApplyGraphicSettings(settings, SceneType.Menu);
+            _settingsApplicator.ApplyGraphicSettings(settings, SceneType.Game);
         }
 
         public void Dispose()

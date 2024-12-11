@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<Project>
+	<!-- Target for copying DLLs to Plugins folder -->
+	<Target Name="CopyToPlugins" AfterTargets="Build">
+		<PropertyGroup>
+			<PluginsDirectory>$(BeatSaberDir)\Plugins</PluginsDirectory>
+			<PendingPluginsDirectory>$(BeatSaberDir)\IPA\Pending\Plugins</PendingPluginsDirectory>
+			<OutputAssemblyName>$(OutputPath)$(AssemblyName)</OutputAssemblyName>
+		</PropertyGroup>
+		
+		<PropertyGroup Condition="'$(Configuration)' == 'Debug'">
+			<DebugPdbFile>$(OutputPath)$(AssemblyName).pdb</DebugPdbFile>
+		</PropertyGroup>
+		
+		<PropertyGroup Condition="'$(Configuration)' == 'Release' Or '$(Configuration)' == 'Release Final'">
+			<ReleasePdbFile>$(OutputPath)$(AssemblyName).pdb</ReleasePdbFile>
+		</PropertyGroup>
+
+		<Message Importance="High" Text="Copying '$(OutputAssemblyName).dll' -> '$(PluginsDirectory)'" Condition="'$(Configuration)' == 'Debug'" />
+		
+		<Copy Condition="'$(Configuration)' == 'Debug'"
+			  SourceFiles="$(OutputAssemblyName).dll;$(DebugPdbFile)"
+			  DestinationFolder="$(PluginsDirectory)"
+			  ContinueOnError="false"/>
+
+		<Message Importance="High" Text="Copying '$(OutputAssemblyName).dll' -> '$(PluginsDirectory)'" Condition="'$(Configuration)' == 'Release' Or '$(Configuration)' == 'Release Final'" />
+		<Copy Condition="'$(Configuration)' == 'Release' Or '$(Configuration)' == 'Release Final'"
+			  SourceFiles="$(OutputAssemblyName).dll"
+			  DestinationFolder="$(PluginsDirectory)"
+			  ContinueOnError="false"/>
+		
+		<Error Condition="!Exists('$(PluginsDirectory)\$(AssemblyName).dll') And !Exists('$(PluginsDirectory)\$(AssemblyName).pdb')"
+			  Text="Copying to Plugins folder failed. Copying to Pending Plugins folder instead."/>
+
+		<Message Importance="High" Text="Copying '$(OutputAssemblyName).dll' -> '$(PendingPluginsDirectory)'" Condition="'$(Configuration)' == 'Debug'" />
+		<Copy Condition="'$(Configuration)' == 'Debug'"
+			  SourceFiles="$(OutputAssemblyName).dll;$(DebugPdbFile)"
+			  DestinationFolder="$(PendingPluginsDirectory)"
+			  ContinueOnError="false"/>
+
+		<Message Importance="High" Text="Copying '$(OutputAssemblyName).dll' -> '$(PendingPluginsDirectory)'" Condition="'$(Configuration)' == 'Release' Or '$(Configuration)' == 'Release Final'" />
+		<Copy Condition="'$(Configuration)' == 'Release' Or '$(Configuration)' == 'Release Final'"
+			  SourceFiles="$(OutputAssemblyName).dll;$(ReleasePdbFile)"
+			  DestinationFolder="$(PendingPluginsDirectory)"
+			  ContinueOnError="false"/>
+		
+		<Error Condition="!Exists('$(PendingPluginsDirectory)\$(AssemblyName).dll') And !Exists('$(PendingPluginsDirectory)\$(AssemblyName).pdb')"
+			  Text="Copying to Pending Plugins folder failed. Please check the build output for more information."/>
+		
+		<Message Importance="High" Text="Beat Saber is running. Please restart the game for changes to be applied." Condition="!Exists('$(PluginsDirectory)\$(AssemblyName).dll') And !Exists('$(PluginsDirectory)\$(AssemblyName).pdb')" />
+	</Target>
+	
+	<!-- Target for Release configuration -->
+	<Target Name="CopyDllToReleaseDirectory" AfterTargets="CopyToPlugins" Condition="'$(Configuration)' == 'Release' Or '$(Configuration)' == 'Release Final'">
+		<PropertyGroup>
+			<DestinationRoot>G:\WebStatic\dirlist\SelfReleases\Build</DestinationRoot>
+			<BeatSaberDirName>$([System.IO.Path]::GetFileName($(BeatSaberDir)))</BeatSaberDirName>
+			<DestinationDirectory>$(DestinationRoot)\$(BeatSaberDirName)\$(MSBuildProjectName)</DestinationDirectory>
+			<OutputAssemblyName>$(OutputPath)$(AssemblyName)</OutputAssemblyName>
+			<BuildTargetDestinationFile>$(DestinationDirectory)\BuildTarget.txt</BuildTargetDestinationFile>
+		</PropertyGroup>
+
+		<MakeDir Directories="$(DestinationDirectory)" />
+
+		<Message Text="Copying '$(OutputAssemblyName).dll' -> '$(DestinationDirectory)\$(AssemblyName).dll'" Importance="high" />
+		<Copy SourceFiles="$(OutputAssemblyName).dll" DestinationFolder="$(DestinationDirectory)" />
+		
+		<WriteLinesToFile File="$(BuildTargetDestinationFile)" Lines="$(BeatSaberDir)" Overwrite="true" />
+	</Target>
+
+	<!-- Target for Release Final configuration -->
+	<Target Name="CopyDllToReleaseFinalDirectory" AfterTargets="CopyToPlugins" Condition="'$(Configuration)' == 'Release Final'">
+		<PropertyGroup>
+			<FinalDestinationRoot>G:\WebStatic\dirlist\SelfReleases\Beat Saber</FinalDestinationRoot>
+			<FinalDestinationDirectory>$(FinalDestinationRoot) $(BeatSaberDirName)</FinalDestinationDirectory>
+			<FinalOutputAssemblyName>$(OutputPath)$(AssemblyName)</FinalOutputAssemblyName>
+		</PropertyGroup>
+
+		<MakeDir Directories="$(FinalDestinationDirectory)" />
+
+		<Message Text="Copying '$(FinalOutputAssemblyName).dll' -> '$(FinalDestinationDirectory)\$(AssemblyName).dll'" Importance="high" />
+		<Copy SourceFiles="$(FinalOutputAssemblyName).dll" DestinationFolder="$(FinalDestinationDirectory)" />
+	</Target>
+</Project>

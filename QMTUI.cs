@@ -1,19 +1,17 @@
 ﻿using BeatSaberMarkupLanguage;
 using BeatSaberMarkupLanguage.Attributes;
 using BeatSaberMarkupLanguage.GameplaySetup;
-#if LATEST
-using BeatSaberMarkupLanguage.Util;
-#else
-using BeatSaberMarkupLanguage.Components;
-#endif
+using BeatSaberMarkupLanguage.ViewControllers;
 using SiraUtil.Logging;
 using System.Linq;
 using UnityEngine;
 using Zenject;
+using static BeatSaber.Settings.QualitySettings;
 
+#pragma warning disable IDE0052 // Remove unread private members
 namespace QuickMirrorToggle
 {
-    internal class QMTUI : NotifiableSingleton<QMTUI>, IInitializable
+    internal class QMTUI : BSMLAutomaticViewController, IInitializable
     {
         private const string QMT_TOGGLE = "" +
             "<bg id='qmt-root'>" +
@@ -21,8 +19,10 @@ namespace QuickMirrorToggle
             "<toggle-setting id='qmt-toggle' hover-hint='His name is Teddy ;3' text='~qmt-toggle-text' size-delta-x='1' size-delta-y='1' bind-value='true' apply-on-change='true' value='qmt-toggle-value'/>" +
             "</horizontal>" +
             "</bg>";
+
         [UIValue("qmt-mirror-setting-options")]
-        private string[] _mirrorSettings = new string[] { "Low", "Medium", "High" };
+        private readonly string[] _mirrorSettings = new string[] { "Low", "Medium", "High" };
+
         [Inject] private readonly QMTConfig _config;
         [Inject] private readonly SiraLog _logger;
         private string _qmtText = "Disable Mirror";
@@ -51,13 +51,13 @@ namespace QuickMirrorToggle
                 _logger.Info("QMTToggleValue set to " + value);
                 _qmtToggleValue = value;
                 NotifyPropertyChanged();
-                if (_config.GameMirrorSetting == MirrorState.Off)
+                if (_config.GameMirrorSetting == MirrorQuality.Off)
                 {
-                    _config.MirrorState = value ? _config.QMTMirrorSetting : MirrorState.Off;
+                    _config.MirrorState = value ? _config.QMTMirrorSetting : MirrorQuality.Off;
                 }
                 else
                 {
-                    _config.MirrorState = value ? MirrorState.Off : _config.GameMirrorSetting;
+                    _config.MirrorState = value ? MirrorQuality.Off : _config.GameMirrorSetting;
                 }
                 _config.Changed();
             }
@@ -69,8 +69,8 @@ namespace QuickMirrorToggle
             get => _config.QMTMirrorSetting.ToString();
             set
             {
-                _config.QMTMirrorSetting = (MirrorState)System.Enum.Parse(typeof(MirrorState), value);
-                if (_config.GameMirrorSetting == MirrorState.Off && _config.MirrorState != MirrorState.Off)
+                _config.QMTMirrorSetting = (MirrorQuality)System.Enum.Parse(typeof(MirrorQuality), value);
+                if (_config.GameMirrorSetting == MirrorQuality.Off && _config.MirrorState != MirrorQuality.Off)
                 {
                     _config.MirrorState = _config.QMTMirrorSetting;
                 }
@@ -80,23 +80,24 @@ namespace QuickMirrorToggle
 
         public void Initialize()
         {
-            GameplaySetup.instance.AddTab("Quick Mirror Toggle", "QuickMirrorToggle.SettingsUI.bsml", this);
-            BSMLParser.instance.Parse(QMT_TOGGLE, Resources.FindObjectsOfTypeAll<LevelSelectionNavigationController>().First().gameObject, this);
+            GameplaySetup.Instance.AddTab("Quick Mirror Toggle", "QuickMirrorToggle.SettingsUI.bsml", this);
+            BSMLParser.Instance.Parse(QMT_TOGGLE, Resources.FindObjectsOfTypeAll<LevelSelectionNavigationController>().First().gameObject, this);
             _qmtRectTransform.localScale *= 0.6f;
-            QMTText = _config.GameMirrorSetting == MirrorState.Off ? "Enable Mirror" : "Disable Mirror";
+            QMTText = _config.GameMirrorSetting == MirrorQuality.Off ? "Enable Mirror" : "Disable Mirror";
             _config.OnChanged += Config_OnChanged;
+            QMTToggleValue = _config.GameMirrorSetting == MirrorQuality.Off ? (_config.MirrorState != MirrorQuality.Off) : (_config.MirrorState == MirrorQuality.Off);
         }
 
         private void Config_OnChanged(QMTConfig newConfig)
         {
             switch (newConfig.GameMirrorSetting)
             {
-                case MirrorState.Off:
+                case MirrorQuality.Off:
                     QMTText = "Enable Mirror";
                     break;
-                case MirrorState.Low:
-                case MirrorState.Medium:
-                case MirrorState.High:
+                case MirrorQuality.Low:
+                case MirrorQuality.Medium:
+                case MirrorQuality.High:
                     QMTText = "Disable Mirror";
                     break;
                 default:
